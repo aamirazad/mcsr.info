@@ -34,11 +34,17 @@ const serverLoader = createServerFn({
   .handler(async ({ data: slugs }) => {
     const page = source.getPage(slugs);
     if (!page) throw notFound();
-    const lastModifiedTime = await getGithubLastEdit({
-      owner: gitConfig.user,
-      repo: gitConfig.repo,
-      path: `content${page.url}`,
-    });
+    let lastModifiedTime: Date | null = null;
+
+    try {
+      lastModifiedTime = await getGithubLastEdit({
+        owner: gitConfig.user,
+        repo: gitConfig.repo,
+        path: `content${page.url}`,
+      });
+    } catch {
+      console.log("Failed to fetch last modified time");
+    }
 
     return {
       url: page.url,
