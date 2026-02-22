@@ -1,6 +1,9 @@
 import { redirect } from "@tanstack/react-router";
 import { createMiddleware, createStart } from "@tanstack/react-start";
 import { rewritePath } from "fumadocs-core/negotiation";
+import { FastResponse } from "srvx";
+
+globalThis.Response = FastResponse;
 
 const { rewrite: rewriteLLM } = rewritePath(
   "/wiki{/*path}.mdx",
