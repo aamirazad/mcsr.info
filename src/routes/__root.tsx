@@ -40,6 +40,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          src="https://analytics.aamirazad.com/api/script.js"
+          data-site-id="217d27bc2507"
+          defer
+        ></script>
       </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider>{children}</RootProvider>
