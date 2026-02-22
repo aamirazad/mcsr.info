@@ -1,6 +1,7 @@
 import browserCollections from "fumadocs-mdx:collections/browser";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { getGithubLastEdit } from "fumadocs-core/content/github";
 import { useFumadocsLoader } from "fumadocs-core/source/client";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import {
@@ -8,10 +9,11 @@ import {
   DocsDescription,
   DocsPage,
   DocsTitle,
+  PageLastUpdate,
 } from "fumadocs-ui/layouts/docs/page";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import { Suspense } from "react";
-import { LLMCopyButton, ViewOptions } from "@/components/ai/page-actions";
+import { EditPage } from "@/components/page-actions";
 import { baseOptions, gitConfig } from "@/lib/layout.shared";
 import { source } from "@/lib/source";
 
@@ -32,10 +34,16 @@ const serverLoader = createServerFn({
   .handler(async ({ data: slugs }) => {
     const page = source.getPage(slugs);
     if (!page) throw notFound();
+    const lastModifiedTime = await getGithubLastEdit({
+      owner: gitConfig.user,
+      repo: gitConfig.repo,
+      path: `content${page.url}`,
+    });
 
     return {
       url: page.url,
       path: page.path,
+      lastModifiedTime,
       pageTree: await source.serializePageTree(source.getPageTree()),
     };
   });
@@ -45,24 +53,17 @@ const clientLoader = browserCollections.docs.createClientLoader({
     { toc, frontmatter, default: MDX },
     // you can define props for the component
     {
-      url,
       path,
+      lastModifiedTime,
     }: {
-      url: string;
       path: string;
+      lastModifiedTime: Date | null;
     },
   ) {
     return (
-      <DocsPage toc={toc}>
+      <DocsPage tableOfContent={{ style: "clerk" }} toc={toc}>
         <DocsTitle>{frontmatter.title}</DocsTitle>
         <DocsDescription>{frontmatter.description}</DocsDescription>
-        <div className="flex flex-row gap-2 items-center border-b -mt-4 pb-6">
-          <LLMCopyButton markdownUrl={`${url}.mdx`} />
-          <ViewOptions
-            markdownUrl={`${url}.mdx`}
-            githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/wiki/${path}`}
-          />
-        </div>
         <DocsBody>
           <MDX
             components={{
@@ -70,6 +71,12 @@ const clientLoader = browserCollections.docs.createClientLoader({
             }}
           />
         </DocsBody>
+        <div className="flex items-center gap-2">
+          {lastModifiedTime && <PageLastUpdate date={lastModifiedTime} />}
+          <EditPage
+            githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/wiki/${path}`}
+          />
+        </div>
       </DocsPage>
     );
   },
