@@ -3,8 +3,8 @@ import { createMiddleware, createStart } from "@tanstack/react-start";
 import { rewritePath } from "fumadocs-core/negotiation";
 
 const { rewrite: rewriteLLM } = rewritePath(
-  "/docs{/*path}.mdx",
-  "/llms.mdx/docs{/*path}",
+  "/wiki{/*path}.mdx",
+  "/llms.mdx/wiki{/*path}",
 );
 
 const llmMiddleware = createMiddleware().server(({ next, request }) => {

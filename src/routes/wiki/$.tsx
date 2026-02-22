@@ -15,7 +15,7 @@ import { LLMCopyButton, ViewOptions } from "@/components/ai/page-actions";
 import { baseOptions, gitConfig } from "@/lib/layout.shared";
 import { source } from "@/lib/source";
 
-export const Route = createFileRoute("/docs/$")({
+export const Route = createFileRoute("/wiki/$")({
   component: Page,
   loader: async ({ params }) => {
     const slugs = params._splat?.split("/") ?? [];
@@ -60,7 +60,7 @@ const clientLoader = browserCollections.docs.createClientLoader({
           <LLMCopyButton markdownUrl={`${url}.mdx`} />
           <ViewOptions
             markdownUrl={`${url}.mdx`}
-            githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${path}`}
+            githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/wiki/${path}`}
           />
         </div>
         <DocsBody>
